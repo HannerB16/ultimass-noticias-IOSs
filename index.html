@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <link rel="stylesheet" href="style.css">
+
+  <title>iOS - Sistema</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      background-color: black;
+      color: white;
+      font-family: -apple-system, BlinkMacSystemFont, "San Francisco", Roboto, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+      text-align: center;
+    }
+
+    .screen, .boot-screen {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background-color: black;
+    }
+
+    .boot-screen {
+      animation: fadeOut 2.5s ease-in-out forwards;
+    }
+
+    @keyframes fadeOut {
+      0% { opacity: 1; }
+      70% { opacity: 1; }
+      100% { opacity: 0; visibility: hidden; }
+    }
+
+    .apple-logo {
+      font-size: 6em;
+      opacity: 0.8;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.8; }
+      50% { opacity: 0.2; }
+    }
+
+    .content {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      animation: fadeIn 1s ease-in-out forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    h1 {
+      font-size: 1.4em;
+      margin-bottom: 0.4em;
+    }
+
+    #countdown {
+      font-size: 3em;
+      color: red;
+      font-weight: bold;
+    }
+
+    .warning {
+      font-size: 0.95em;
+      color: gray;
+      margin-top: 10px;
+    }
+
+    .final-message {
+      font-size: 2em;
+      color: #00FF00;
+      margin-top: 20px;
+      animation: blink 0.8s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.1; }
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Simulación de arranque tipo iOS -->
+  <div class="boot-screen">
+    <div class="apple-logo"></div>
+  </div>
+
+  <!-- Pantalla de error -->
+  <div class="screen content">
+    <div class="apple-logo"></div>
+    <h1>iOS detectó un error grave</h1>
+    <p>El sistema se apagará en:</p>
+    <div id="countdown">30</div>
+    <p class="warning">No apagues el dispositivo ni cierres esta pantalla.</p>
+    <div id="finalMessage" class="final-message hidden">
+      😆 JAJAJA<br>Era solo una bromita 😅
+    </div>
+  </div>
+
+  <script>
+    let counter = 30;
+    const countdown = document.getElementById("countdown");
+    const finalMessage = document.getElementById("finalMessage");
+    const content = document.querySelector(".content");
+
+    // Esperar 3 segundos y mostrar pantalla principal
+    setTimeout(() => {
+      document.querySelector(".boot-screen").classList.add("hidden");
+      content.style.display = "flex";
+
+      const interval = setInterval(() => {
+        counter--;
+        if (counter <= 0) {
+          clearInterval(interval);
+          countdown.classList.add("hidden");
+          finalMessage.classList.remove("hidden");
+
+          // Vibrar al finalizar si está en móvil
+          if (navigator.vibrate) navigator.vibrate([100, 200, 100, 200]);
+        } else {
+          countdown.textContent = counter;
+        }
+      }, 1000);
+    }, 2500);
+
+    // Bloquear navegación hacia atrás
+    history.pushState(null, null, location.href);
+    window.onpopstate = () => history.go(1);
+
+    // Bloquear zoom y gestos multitáctiles
+    document.addEventListener('gesturestart', e => e.preventDefault());
+    document.addEventListener('touchstart', e => {
+      if (e.touches.length > 1) e.preventDefault();
+    }, { passive: false });
+    document.body.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
+  </script>
+</body>
+</html>
